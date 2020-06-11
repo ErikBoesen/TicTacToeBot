@@ -1,4 +1,4 @@
-class TicTacToe:
+class Game:
     players = [""] * 2
     board = [" "] * 9
     movements = {"a1": 0, "a2": 1, "a3": 2,
@@ -34,7 +34,7 @@ class TicTacToe:
                 return f"{self.players[1]} wins!"
         return ""
 
-    def response(self, query, message):
+    def response(self, query, group_id):
         arguments = query.split()
         command = arguments.pop(0).lower()
         if command == "join":

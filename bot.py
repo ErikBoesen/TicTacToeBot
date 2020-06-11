@@ -8,10 +8,12 @@ import requests
 import os
 import time
 import argparse
+from game import Game
 
 
 app = Flask(__name__)
 bot = mebots.Bot("tictactoebot", os.environ.get("BOT_TOKEN"))
+
 
 MAX_MESSAGE_LENGTH = 1000
 PREFIX = "#"
@@ -40,8 +42,42 @@ def process_message(message):
     responses = []
     if message.sender_type == "user":
         if message.text.startswith(PREFIX):
-            instructions = message.text[len(PREFIX):].strip().split(None, 1)
-            query = instructions[0] if len(instructions) > 0 else ""
+            query = message["text"][len(PREFIX):].strip().split(None, 1)
+            arguments = query.split()
+            command = arguments.pop(0).lower()
+            group_id = message["group_id"]
+            if command == "join":
+                if self.players[0] == "":
+                    self.players[0] = message.name
+                    return f"{message.name} has joined, waiting on a second player"
+                elif self.players[1] == "":
+                    self.players[1] = message.name
+                    return [f"{message.name} has joined, ready to play", self.string_board()]
+                else:
+                    return f"Game full. {self.players[0]} & {self.players[1]} are playing!"
+            elif command == "end":
+                self.clear()
+            elif command == "help":
+                desc = "Possible commands: help, join, end. Positions:\n"
+                desc += "|".join(["a1", "a2", "a3"]) + "\n——————\n"
+                desc += "|".join(["b1", "b2", "b3"]) + "\n——————\n"
+                desc += "|".join(["c1", "c2", "c3"])
+                return desc
+            elif command in self.movements:
+                loc = self.movements[command]
+                if self.turn and message.name == self.players[0]:
+                    self.turn = False
+                    self.board[loc] = "x"
+                elif not self.turn and message.name == self.players[1]:
+                    self.turn = True
+                    self.board[loc] = "o"
+                if self.check() != "":
+                    return self.check()
+                return self.string_board()
+            else:
+                return "Unknown command."
+
+
     return responses
 
 
