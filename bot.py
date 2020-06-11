@@ -40,7 +40,6 @@ def reply(message, group_id):
 
 
 def process_message(message):
-    responses = []
     if message.sender_type == "user":
         if message.text.startswith(PREFIX):
             query = message["text"][len(PREFIX):].strip().split(None, 1)
@@ -58,7 +57,7 @@ def process_message(message):
                     game.join(message["name"], message["user_id"])
                     return [
                         f"{game.players[1].name} has joined, starting game!",
-                        game.log_start()
+                        game.log_turn()
                     ]
                 else:
                     return f"Game full. {game.players[0].name} & {game.players[1].name} are playing!"
@@ -69,20 +68,21 @@ def process_message(message):
                 if not game.in_turn(user_id):
                     return "Not your turn!"
                 position = game.get_position(command)
+                if game.is_occupied(position):
+                    return "That spot is taken."
                 if game.turn == 0:
-                    self.board[loc] = "x"
-                elif not self.turn:
-                    self.turn = True
-                    self.board[loc] = "o"
+                    self.board[position] = "X"
+                else:
+                    self.board[position] = "O"
                 game.turn = not game.turn
-                if self.check() != "":
-                    return self.check()
-                return self.string_board()
+                winner = game.winner()
+                if winner is not None:
+                    response = game.log_end(winner)
+                    games.pop(group_id)
+                    return response
+                return game.log_turn()
             else:
                 return "Unknown command."
-
-
-    return responses
 
 
 def send(message, group_id):

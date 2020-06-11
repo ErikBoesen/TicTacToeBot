@@ -38,10 +38,16 @@ class Game:
         board = board % self.board
         return board
 
-    def log_start(self):
+    def log_turn(self):
         return (
             self.log_board() + '\n\n' +
-            ("It is %s's turn (%s). To take a turn, say # followed by the number for the square to play in, like A1." % self.PIECES[self.turn], self.players[self.turn])
+            ("It is %s's turn (%s). To take a turn, say # followed by the number for the square to play in, like A1." % (self.PIECES[self.turn], self.players[self.turn]))
+        )
+
+    def log_end(self, winner: int):
+        return (
+            self.log_board() + '\n\n' +
+            ("%s (%s) wins!" % (self.PIECES[winner], self.players[winner]))
         )
 
     # Completion checking
