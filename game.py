@@ -73,8 +73,8 @@ class Game:
             slice(0, 9, 4), slice(2, 7, 2)
         ]
         for run in runs:
-            if self.board[run] == self.PIECES[0] * 3:
+            if self.board[run] == [self.PIECES[0]] * 3:
                 return 0
-            if self.board[run] == self.PIECES[1] * 3:
+            if self.board[run] == [self.PIECES[1]] * 3:
                 return 1
         return None
