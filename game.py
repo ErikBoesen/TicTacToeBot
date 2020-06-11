@@ -7,7 +7,8 @@ class Game:
     movements = {"a1": 0, "a2": 1, "a3": 2,
                  "b1": 3, "b2": 4, "b3": 5,
                  "c1": 6, "c2": 7, "c3": 8}
-    turn = True
+    PIECES = ["X", "O"]
+
 
     def __init__(self):
         self.players = []
@@ -22,18 +23,20 @@ class Game:
         self.players.push(Player(*args))
 
     def log_board(self):
-        pboard = "|".join(self.board[:3]) + "\n——————\n"
-        pboard += "|".join(self.board[3:6]) + "\n——————\n"
-        pboard += "|".join(self.board[6:])
-        return pboard
+        with open("board.txt") as f:
+            board = f.read()
+        board = board % self.board
+        return board
 
     def log_start(self):
-        return self.log_board()
+        return (
+            self.log_board() + '\n\n' +
+            ("It is %s's turn (%s). To take a turn, say # followed by the number for the square to play in, like A1." % self.PIECES[self.turn], self.players[self.turn])
+        )
 
     def log_turn(self):
 
-
-    def check(self):
+    def winner(self):
         # TODO: find a better way to check for three in a row
         check = [self.board[0:3], self.board[3:6], self.board[6:],
                  [self.board[0], self.board[3], self.board[6]],
@@ -42,10 +45,8 @@ class Game:
                  [self.board[0], self.board[4], self.board[8]],
                  [self.board[2], self.board[4], self.board[6]]]
         for arr in check:
-            if arr[:3] == ["x"] * 3:
-                self.clear()
-                return f"{self.players[0]} wins!"
-            elif arr[:3] == ["o"] * 3:
-                self.clear()
-                return f"{self.players[1]} wins!"
-        return ""
+            if arr[:3] == ["X"] * 3:
+                return 0
+            elif arr[:3] == ["O"] * 3:
+                return 1
+        return None

@@ -52,7 +52,7 @@ def process_message(message):
                 if game is None:
                     game = games[group_id] = Game()
                     game.join(message["name"], group_id)
-                    return "{message["name"]} has joined, waiting on a second player"
+                    return "{game.players[0]} has joined, waiting on a second player"
                 elif not game.is_full:
                     game.join(message["name"], group_id)
                     return [
@@ -60,16 +60,11 @@ def process_message(message):
                         game.log_start()
                     ]
                 else:
-                    return f"Game full. {self.players[0].name} & {self.players[1].name} are playing!"
+                    return f"Game full. {game.players[0].name} & {game.players[1].name} are playing!"
             elif command == "end":
-                self.clear()
-            elif command == "help":
-                desc = "Possible commands: help, join, end. Positions:\n"
-                desc += "|".join(["a1", "a2", "a3"]) + "\n——————\n"
-                desc += "|".join(["b1", "b2", "b3"]) + "\n——————\n"
-                desc += "|".join(["c1", "c2", "c3"])
-                return desc
-            elif command in self.movements:
+                games.pop(group_id)
+                return "Game ended."
+            elif command in game.movements:
                 loc = self.movements[command]
                 if self.turn and message["name"] == self.players[0]:
                     self.turn = False
