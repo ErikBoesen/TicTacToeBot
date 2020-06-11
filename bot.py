@@ -54,7 +54,8 @@ def process_message(message):
                     game.join(message["name"], user_id)
                     return game.players[0].name + " has joined, waiting on a second player. Say #join to join!"
                 elif not game.is_full:
-                    game.join(message["name"], user_id)
+                    if not game.join(message["name"], user_id):
+                        return "Already in game!"
                     return [
                         game.players[1].name + " has joined, starting game!",
                         game.log_turn()

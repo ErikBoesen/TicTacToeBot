@@ -15,8 +15,12 @@ class Game:
     def is_full(self):
         return len(self.players) == 2
 
-    def join(self, *args):
-        self.players.append(Player(*args))
+    def join(self, name, user_id):
+        for player in self.players:
+            if player.user_id == user_id:
+                return False
+        self.players.append(Player(name, user_id))
+        return True
 
     # Methods for executing a turn
 
@@ -55,15 +59,15 @@ class Game:
     # Completion checking
 
     def winner(self):
-        slices = [
+        runs = [
             slice(0, 3), slice(3, 6), slice(6, 9),
             slice(0, 9, 3), slice(1, 9, 3), slice(2, 9, 3),
             # Diagonals
             slice(0, 9, 4), slice(2, 7, 2)
         ]
-        for s in slices:
-            if self.board[s] == self.PIECES[0] * 3:
+        for run in runs:
+            if self.board[run] == self.PIECES[0] * 3:
                 return 0
-            if self.board[s] == self.PIECES[1] * 3:
+            if self.board[run] == self.PIECES[1] * 3:
                 return 1
         return None
