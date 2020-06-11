@@ -72,9 +72,13 @@ def process_message(message):
                 if game.is_occupied(index):
                     return "That spot is taken."
                 game.take_turn(index)
+                if game.tied():
+                    response = game.log_tie()
+                    games.pop(group_id)
+                    return response
                 winner = game.winner()
                 if winner is not None:
-                    response = game.log_end(winner)
+                    response = game.log_win(winner)
                     games.pop(group_id)
                     return response
                 return game.log_turn()

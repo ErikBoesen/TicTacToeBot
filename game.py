@@ -57,13 +57,22 @@ class Game:
             ("It is %s's turn (%s). To take a turn, say # followed by the position for the square to play in, like A1." % (self.PIECES[self.turn], self.players[self.turn].name))
         )
 
-    def log_end(self, winner: int):
+    def log_win(self, winner: int):
         return (
             self.log_board() + '\n\n' +
             ("🎉 %s (%s) wins! Say #start to play again." % (self.PIECES[winner], self.players[winner].name))
         )
 
+    def log_tie(self):
+        return (
+            self.log_board() + '\n\n' +
+            "It's a tie! Say #start to play again."
+        )
+
     # Completion checking
+
+    def tied(self):
+        return all([is_occupied(i) for i in range(0, 9)])
 
     def winner(self):
         runs = [
