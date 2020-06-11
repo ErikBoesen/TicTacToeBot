@@ -42,14 +42,14 @@ class Game:
 
     # Methods for outputting information in string form
 
-    def safe_spaces(text):
+    def safe_spaces(self, text):
         return text.replace(" ", "\u2004")
 
     def log_board(self):
         with open("board.txt") as f:
             board = f.read()
         board = board % tuple(self.board)
-        return board
+        return self.safe_spaces(board)
 
     def log_turn(self):
         return (
