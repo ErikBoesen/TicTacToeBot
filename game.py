@@ -4,11 +4,7 @@ class Player:
         self.user_id = user_id
 
 class Game:
-    movements = ["a1", "b1", "c1",
-                 "a2", "b2", "c2",
-                 "a3", "b3", "c3"]
     PIECES = ["X", "O"]
-
 
     def __init__(self):
         self.players = []
@@ -24,11 +20,14 @@ class Game:
 
     # Methods for executing a turn
 
-    def get_position(self, number: str):
-        return ((ord(number[0]) - ord('a')) * 3) + (int(number[1]) - 1)
+    def is_valid_position(self, position: str):
+        return len(position) == 2 and position[0] in "abc" and position[1] in "123"
 
-    def is_occupied(self, position: int) -> bool:
-        return not self.board[position] == " "
+    def get_index(self, position: str):
+        return ((ord(position[0]) - ord('a')) * 3) + (int(position[1]) - 1)
+
+    def is_occupied(self, index: int) -> bool:
+        return not self.board[index] == " "
 
     def in_turn(self, user_id):
         return self.players[self.turn].user_id == user_id
@@ -44,7 +43,7 @@ class Game:
     def log_turn(self):
         return (
             self.log_board() + '\n\n' +
-            ("It is %s's turn (%s). To take a turn, say # followed by the number for the square to play in, like A1." % (self.PIECES[self.turn], self.players[self.turn].name))
+            ("It is %s's turn (%s). To take a turn, say # followed by the position for the square to play in, like A1." % (self.PIECES[self.turn], self.players[self.turn].name))
         )
 
     def log_end(self, winner: int):
@@ -56,16 +55,15 @@ class Game:
     # Completion checking
 
     def winner(self):
-        # TODO: find a better way to check for three in a row
-        check = [self.board[0:3], self.board[3:6], self.board[6:],
-                 [self.board[0], self.board[3], self.board[6]],
-                 [self.board[1], self.board[4], self.board[7]],
-                 [self.board[2], self.board[5], self.board[8]],
-                 [self.board[0], self.board[4], self.board[8]],
-                 [self.board[2], self.board[4], self.board[6]]]
-        for arr in check:
-            if arr[:3] == ["X"] * 3:
+        slices = [
+            slice(0, 3), slice(3, 6), slice(6, 9),
+            slice(0, 9, 3), slice(1, 9, 3), slice(2, 9, 3),
+            # Diagonals
+            slice(0, 9, 4), slice(2, 7, 2)
+        ]
+        for s in slices:
+            if self.board[s] == self.PIECES[0] * 3:
                 return 0
-            elif arr[:3] == ["O"] * 3:
+            if self.board[s] == self.PIECES[1] * 3:
                 return 1
         return None

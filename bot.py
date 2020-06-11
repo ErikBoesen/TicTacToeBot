@@ -64,7 +64,7 @@ def process_message(message):
             elif command == "end":
                 games.pop(group_id)
                 return "Game ended."
-            elif command in game.movements:
+            elif game.is_valid_number(command):
                 if not game.in_turn(user_id):
                     return "Not your turn!"
                 position = game.get_position(command)
