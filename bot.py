@@ -7,7 +7,6 @@ from threading import Thread
 import requests
 import os
 import time
-import argparse
 from game import Game
 
 
@@ -47,16 +46,17 @@ def process_message(message):
             command = arguments.pop(0).lower()
             group_id = message["group_id"]
             game = games.get(group_id)
+            user_id = message["user_id"]
 
             if command in ("start", "join"):
                 if game is None:
                     game = games[group_id] = Game()
-                    game.join(message["name"], message["user_id"])
-                    return "{game.players[0]} has joined, waiting on a second player"
+                    game.join(message["name"], user_id)
+                    return game.players[0].name + " has joined, waiting on a second player. Say #join to join!"
                 elif not game.is_full:
-                    game.join(message["name"], message["user_id"])
+                    game.join(message["name"], user_id)
                     return [
-                        f"{game.players[1].name} has joined, starting game!",
+                        game.players[1].name + " has joined, starting game!",
                         game.log_turn()
                     ]
                 else:
@@ -71,9 +71,9 @@ def process_message(message):
                 if game.is_occupied(position):
                     return "That spot is taken."
                 if game.turn == 0:
-                    self.board[position] = "X"
+                    game.board[position] = "X"
                 else:
-                    self.board[position] = "O"
+                    game.board[position] = "O"
                 game.turn = not game.turn
                 winner = game.winner()
                 if winner is not None:
@@ -116,14 +116,18 @@ def send(message, group_id):
 
 # Local testing
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("command", nargs="?")
-    args = parser.parse_args()
     message = {"sender_type": "user", "group_id": 49940116}
-    if args.command:
-        message["text"] = args.command
-        print(process_message(message))
-    else:
-        while True:
-            message["text"] = input("> ")
-            print(process_message(message))
+    current_user = 0
+    while True:
+        text = input("Player %d > " % (current_user + 1))
+        if not text:
+            current_user = not current_user
+        else:
+            message["user_id"] = int(current_user)
+            message["name"] = "Player %d" % (current_user + 1)
+            message["text"] = text
+            response = process_message(message)
+            if isinstance(response, list):
+                print('\n'.join(response))
+            else:
+                print(response)

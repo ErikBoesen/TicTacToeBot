@@ -4,9 +4,9 @@ class Player:
         self.user_id = user_id
 
 class Game:
-    movements = {"a1": 0, "a2": 1, "a3": 2,
-                 "b1": 3, "b2": 4, "b3": 5,
-                 "c1": 6, "c2": 7, "c3": 8}
+    movements = ["a1", "b1", "c1",
+                 "a2", "b2", "c2",
+                 "a3", "b3", "c3"]
     PIECES = ["X", "O"]
 
 
@@ -20,7 +20,7 @@ class Game:
         return len(self.players) == 2
 
     def join(self, *args):
-        self.players.push(Player(*args))
+        self.players.append(Player(*args))
 
     # Methods for executing a turn
 
@@ -30,24 +30,27 @@ class Game:
     def is_occupied(self, position: int) -> bool:
         return not self.board[position] == " "
 
+    def in_turn(self, user_id):
+        return self.players[self.turn].user_id == user_id
+
     # Methods for outputting information in string form
 
     def log_board(self):
         with open("board.txt") as f:
             board = f.read()
-        board = board % self.board
+        board = board % tuple(self.board)
         return board
 
     def log_turn(self):
         return (
             self.log_board() + '\n\n' +
-            ("It is %s's turn (%s). To take a turn, say # followed by the number for the square to play in, like A1." % (self.PIECES[self.turn], self.players[self.turn]))
+            ("It is %s's turn (%s). To take a turn, say # followed by the number for the square to play in, like A1." % (self.PIECES[self.turn], self.players[self.turn].name))
         )
 
     def log_end(self, winner: int):
         return (
             self.log_board() + '\n\n' +
-            ("%s (%s) wins!" % (self.PIECES[winner], self.players[winner]))
+            ("%s (%s) wins! Say #start to play again." % (self.PIECES[winner], self.players[winner].name))
         )
 
     # Completion checking
