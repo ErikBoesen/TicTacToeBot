@@ -40,9 +40,9 @@ def reply(message, group_id):
 
 
 def process_message(message):
-    if message.sender_type == "user":
-        if message.text.startswith(PREFIX):
-            query = message["text"][len(PREFIX):].strip().split(None, 1)
+    if message["sender_type"] == "user":
+        if message["text"].startswith(PREFIX):
+            query = message["text"][len(PREFIX):].strip()
             arguments = query.split()
             command = arguments.pop(0).lower()
             group_id = message["group_id"]
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("command", nargs="?")
     args = parser.parse_args()
-    message = {"sender_type": "user", "group_id": 49940116}))
+    message = {"sender_type": "user", "group_id": 49940116}
     if args.command:
         message["text"] = args.command
         print(process_message(message))
