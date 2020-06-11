@@ -65,17 +65,13 @@ def process_message(message):
             elif command == "end":
                 games.pop(group_id)
                 return "Game ended."
-            elif game.is_valid_number(command):
+            elif game.is_valid_position(command):
                 if not game.in_turn(user_id):
                     return "Not your turn!"
-                position = game.get_position(command)
-                if game.is_occupied(position):
+                index = game.get_index(command)
+                if game.is_occupied(index):
                     return "That spot is taken."
-                if game.turn == 0:
-                    game.board[position] = "X"
-                else:
-                    game.board[position] = "O"
-                game.turn = not game.turn
+                game.take_turn(index)
                 winner = game.winner()
                 if winner is not None:
                     response = game.log_end(winner)

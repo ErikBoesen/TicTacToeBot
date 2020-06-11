@@ -28,7 +28,7 @@ class Game:
         return len(position) == 2 and position[0] in "abc" and position[1] in "123"
 
     def get_index(self, position: str):
-        return ((ord(position[0]) - ord('a')) * 3) + (int(position[1]) - 1)
+        return ((int(position[1]) - 1) * 3 + (ord(position[0]) - ord('a')))
 
     def is_occupied(self, index: int) -> bool:
         return not self.board[index] == " "
@@ -36,7 +36,14 @@ class Game:
     def in_turn(self, user_id):
         return self.players[self.turn].user_id == user_id
 
+    def take_turn(self, index: int):
+        self.board[index] = self.PIECES[self.turn]
+        self.turn = not self.turn
+
     # Methods for outputting information in string form
+
+    def safe_spaces(text):
+        return text.replace(" ", "\u2004")
 
     def log_board(self):
         with open("board.txt") as f:
@@ -53,7 +60,7 @@ class Game:
     def log_end(self, winner: int):
         return (
             self.log_board() + '\n\n' +
-            ("%s (%s) wins! Say #start to play again." % (self.PIECES[winner], self.players[winner].name))
+            ("🎉 %s (%s) wins! Say #start to play again." % (self.PIECES[winner], self.players[winner].name))
         )
 
     # Completion checking
