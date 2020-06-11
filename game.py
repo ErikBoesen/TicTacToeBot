@@ -22,6 +22,16 @@ class Game:
     def join(self, *args):
         self.players.push(Player(*args))
 
+    # Methods for executing a turn
+
+    def get_position(self, number: str):
+        return ((ord(number[0]) - ord('a')) * 3) + (int(number[1]) - 1)
+
+    def is_occupied(self, position: int) -> bool:
+        return not self.board[position] == " "
+
+    # Methods for outputting information in string form
+
     def log_board(self):
         with open("board.txt") as f:
             board = f.read()
@@ -34,7 +44,7 @@ class Game:
             ("It is %s's turn (%s). To take a turn, say # followed by the number for the square to play in, like A1." % self.PIECES[self.turn], self.players[self.turn])
         )
 
-    def log_turn(self):
+    # Completion checking
 
     def winner(self):
         # TODO: find a better way to check for three in a row

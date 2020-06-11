@@ -48,13 +48,14 @@ def process_message(message):
             command = arguments.pop(0).lower()
             group_id = message["group_id"]
             game = games.get(group_id)
-            if command == "join":
+
+            if command in ("start", "join"):
                 if game is None:
                     game = games[group_id] = Game()
-                    game.join(message["name"], group_id)
+                    game.join(message["name"], message["user_id"])
                     return "{game.players[0]} has joined, waiting on a second player"
                 elif not game.is_full:
-                    game.join(message["name"], group_id)
+                    game.join(message["name"], message["user_id"])
                     return [
                         f"{game.players[1].name} has joined, starting game!",
                         game.log_start()
@@ -65,13 +66,15 @@ def process_message(message):
                 games.pop(group_id)
                 return "Game ended."
             elif command in game.movements:
-                loc = self.movements[command]
-                if self.turn and message["name"] == self.players[0]:
-                    self.turn = False
+                if not game.in_turn(user_id):
+                    return "Not your turn!"
+                position = game.get_position(command)
+                if game.turn == 0:
                     self.board[loc] = "x"
-                elif not self.turn and message["name"] == self.players[1]:
+                elif not self.turn:
                     self.turn = True
                     self.board[loc] = "o"
+                game.turn = not game.turn
                 if self.check() != "":
                     return self.check()
                 return self.string_board()
