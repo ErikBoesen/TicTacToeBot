@@ -14,9 +14,10 @@ from game import Game
 app = Flask(__name__)
 bot = mebots.Bot("tictactoebot", os.environ.get("BOT_TOKEN"))
 
-
 MAX_MESSAGE_LENGTH = 1000
 PREFIX = "#"
+
+games = {}
 
 
 # Webhook receipt and response
@@ -46,15 +47,20 @@ def process_message(message):
             arguments = query.split()
             command = arguments.pop(0).lower()
             group_id = message["group_id"]
+            game = games.get(group_id)
             if command == "join":
-                if self.players[0] == "":
-                    self.players[0] = message.name
-                    return f"{message.name} has joined, waiting on a second player"
-                elif self.players[1] == "":
-                    self.players[1] = message.name
-                    return [f"{message.name} has joined, ready to play", self.string_board()]
+                if game is None:
+                    game = games[group_id] = Game()
+                    game.join(message["name"], group_id)
+                    return "{message["name"]} has joined, waiting on a second player"
+                elif not game.is_full:
+                    game.join(message["name"], group_id)
+                    return [
+                        f"{game.players[1].name} has joined, starting game!",
+                        game.log_start()
+                    ]
                 else:
-                    return f"Game full. {self.players[0]} & {self.players[1]} are playing!"
+                    return f"Game full. {self.players[0].name} & {self.players[1].name} are playing!"
             elif command == "end":
                 self.clear()
             elif command == "help":
@@ -65,10 +71,10 @@ def process_message(message):
                 return desc
             elif command in self.movements:
                 loc = self.movements[command]
-                if self.turn and message.name == self.players[0]:
+                if self.turn and message["name"] == self.players[0]:
                     self.turn = False
                     self.board[loc] = "x"
-                elif not self.turn and message.name == self.players[1]:
+                elif not self.turn and message["name"] == self.players[1]:
                     self.turn = True
                     self.board[loc] = "o"
                 if self.check() != "":
