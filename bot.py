@@ -112,7 +112,7 @@ def send(message, group_id):
         data["text"] = message
     # Prevent sending message if there's no content
     # It would be rejected anyway
-    response = requests.post("https://api.groupme.com/v3/bots/post", data=data)
+    response = requests.post("https://api.groupme.com/v3/bots/post", json=data)
 
 
 # Local testing
