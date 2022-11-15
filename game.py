@@ -72,7 +72,7 @@ class Game:
     # Completion checking
 
     def tied(self):
-        return all([is_occupied(i) for i in range(0, 9)])
+        return all([self.is_occupied(i) for i in range(0, 9)])
 
     def winner(self):
         runs = [
