@@ -66,6 +66,8 @@ def process_message(message):
                 games.pop(group_id)
                 return "Game ended."
             elif game.is_valid_position(command):
+                if game is None:
+                    return "No game in progress. Start one with #start!"
                 if not game.in_turn(user_id):
                     return "Not your turn!"
                 index = game.get_index(command)
